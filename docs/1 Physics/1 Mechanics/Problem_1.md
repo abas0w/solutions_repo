@@ -188,6 +188,10 @@ plt.show()
 
 ---
 
+
+![graphic](../images/m1_1.png)
+
+
 ### Exploring Parameters
 
 You can vary $v_0$, $h$, and $g$ and plot multiple curves on the same graph:
@@ -210,6 +214,8 @@ plt.show()
 ```
 
 ---
+
+![graphic](../images/m1_2.png)
 
 ## 5. Discussion on Limitations and Extensions
 
