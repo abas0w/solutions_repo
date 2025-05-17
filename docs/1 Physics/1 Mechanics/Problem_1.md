@@ -189,7 +189,7 @@ plt.show()
 ---
 
 
-![graphic](../images/m1_1.png)
+![graphic](../images/image_m1_1.png)
 
 
 ### Exploring Parameters
@@ -215,7 +215,7 @@ plt.show()
 
 ---
 
-![graphic](../images/m1_2.png)
+![graphic](../images/image_m1_2.png)
 
 ## 5. Discussion on Limitations and Extensions
 
