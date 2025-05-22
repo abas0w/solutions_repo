@@ -172,6 +172,169 @@
 <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
 <div class="section" itemprop="articleBody">
 <h1 id="problem-2">Problem 2</h1>
+<h1 id="solution-for-problem-2-dynamics-of-a-forced-damped-pendulum">Solution for Problem 2: Dynamics of a Forced Damped Pendulum</h1>
+<hr/>
+<h2 id="1-theoretical-foundation">1. Theoretical Foundation</h2>
+<h3 id="differential-equation">Differential Equation</h3>
+<p>The motion of a forced damped pendulum is governed by the nonlinear differential equation:</p>
+<div class="arithmatex">\[
+\frac{d^2 \theta}{dt^2} + b \frac{d\theta}{dt} + \frac{g}{L} \sin \theta = A \cos(\omega t)
+\]</div>
+<p>where</p>
+<ul>
+<li><span class="arithmatex">\(\theta(t)\)</span>: angular displacement,</li>
+<li><span class="arithmatex">\(b\)</span>: damping coefficient,</li>
+<li><span class="arithmatex">\(g\)</span>: acceleration due to gravity,</li>
+<li><span class="arithmatex">\(L\)</span>: length of the pendulum,</li>
+<li><span class="arithmatex">\(A\)</span>: amplitude of external driving torque,</li>
+<li><span class="arithmatex">\(\omega\)</span>: angular frequency of driving force.</li>
+</ul>
+<hr/>
+<h3 id="small-angle-approximation">Small-Angle Approximation</h3>
+<p>For small oscillations, <span class="arithmatex">\(\sin \theta \approx \theta\)</span>. The equation becomes linear:</p>
+<div class="arithmatex">\[
+\frac{d^2 \theta}{dt^2} + b \frac{d\theta}{dt} + \frac{g}{L} \theta = A \cos(\omega t)
+\]</div>
+<hr/>
+<h3 id="homogeneous-solution-no-driving-force">Homogeneous Solution (No Driving Force)</h3>
+<p>The characteristic equation:</p>
+<div class="arithmatex">\[
+r^2 + b r + \frac{g}{L} = 0
+\]</div>
+<p>Solutions:</p>
+<div class="arithmatex">\[
+r = \frac{-b \pm \sqrt{b^2 - 4 \frac{g}{L}}}{2}
+\]</div>
+<ul>
+<li>Underdamped (<span class="arithmatex">\(b^2 &lt; 4g/L\)</span>): Oscillatory decay.</li>
+<li>Overdamped (<span class="arithmatex">\(b^2 &gt; 4g/L\)</span>): Exponential decay without oscillation.</li>
+<li>Critically damped (<span class="arithmatex">\(b^2 = 4g/L\)</span>).</li>
+</ul>
+<hr/>
+<h3 id="particular-solution-steady-state-forced-response">Particular Solution (Steady-State Forced Response)</h3>
+<p>Assuming steady-state solution of form:</p>
+<div class="arithmatex">\[
+\theta_p = \Theta \cos(\omega t - \delta)
+\]</div>
+<p>Plug into differential equation and solve for amplitude <span class="arithmatex">\(\Theta\)</span>:</p>
+<div class="arithmatex">\[
+\Theta = \frac{A}{\sqrt{\left(\frac{g}{L} - \omega^2\right)^2 + b^2 \omega^2}}
+\]</div>
+<p>Phase lag <span class="arithmatex">\(\delta\)</span> satisfies:</p>
+<div class="arithmatex">\[
+\tan \delta = \frac{b \omega}{\frac{g}{L} - \omega^2}
+\]</div>
+<hr/>
+<h3 id="resonance-condition">Resonance Condition</h3>
+<p>Resonance approximately occurs when the driving frequency matches the natural frequency of the system (undamped):</p>
+<div class="arithmatex">\[
+\omega_0 = \sqrt{\frac{g}{L}}
+\]</div>
+<p>The presence of damping <span class="arithmatex">\(b\)</span> shifts and broadens the resonance peak.</p>
+<hr/>
+<h2 id="2-analysis-of-dynamics">2. Analysis of Dynamics</h2>
+<ul>
+<li><strong>Damping <span class="arithmatex">\(b\)</span></strong>: Increasing damping reduces amplitude, broadens resonance peak, and suppresses chaos.</li>
+<li><strong>Driving amplitude <span class="arithmatex">\(A\)</span></strong>: Larger amplitudes can push the system into nonlinear and chaotic regimes.</li>
+<li><strong>Driving frequency <span class="arithmatex">\(\omega\)</span></strong>: Changes in frequency cause resonance effects; near <span class="arithmatex">\(\omega_0\)</span>, amplitude peaks.</li>
+<li><strong>Nonlinearity (<span class="arithmatex">\(\sin \theta\)</span>)</strong>: For large <span class="arithmatex">\(\theta\)</span>, the system exhibits complex dynamics including period doubling and chaos.</li>
+</ul>
+<hr/>
+<h2 id="3-practical-applications">3. Practical Applications</h2>
+<ul>
+<li><strong>Energy Harvesting:</strong> Mechanical oscillators capturing ambient vibrations often modeled as forced damped pendulums.</li>
+<li><strong>Suspension Bridges:</strong> Forced oscillations due to wind or traffic forces modeled similarly to study resonance risks.</li>
+<li><strong>Oscillating Circuits:</strong> RLC circuits with external AC sources show analogous behavior.</li>
+<li><strong>Biomechanics:</strong> Human gait analyzed with forced oscillator models.</li>
+</ul>
+<hr/>
+<h2 id="4-implementation-python-simulation">4. Implementation: Python Simulation</h2>
+<p>We use numerical integration (Runge-Kutta 4th order) to solve the nonlinear ODE.</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+
+# Parameters
+g = 9.81        # m/s^2
+L = 1.0         # meters
+b = 0.5         # damping coefficient
+A = 1.2         # driving amplitude
+omega = 2/3     # driving frequency
+
+# System of first order ODEs:
+# Let y = [theta, omega_theta], where omega_theta = dtheta/dt
+def forced_damped_pendulum(t, y):
+    theta, omega_theta = y
+    dtheta_dt = omega_theta
+    domega_dt = -b * omega_theta - (g/L) * np.sin(theta) + A * np.cos(omega * t)
+    return [dtheta_dt, domega_dt]
+
+# Time span
+t_span = (0, 60)
+t_eval = np.linspace(*t_span, 1000)
+
+# Initial conditions: theta=0.2 rad, omega=0
+y0 = [0.2, 0.0]
+
+# Solve ODE
+sol = solve_ivp(forced_damped_pendulum, t_span, y0, t_eval=t_eval, method='RK45')
+
+# Plot angular displacement over time
+plt.figure(figsize=(10,4))
+plt.plot(sol.t, sol.y[0])
+plt.title("Forced Damped Pendulum: Angular Displacement vs Time")
+plt.xlabel("Time (s)")
+plt.ylabel("Angle θ (rad)")
+plt.grid(True)
+plt.show()
+
+# Phase space plot (θ vs ω)
+plt.figure(figsize=(6,6))
+plt.plot(sol.y[0], sol.y[1])
+plt.title("Phase Space of Forced Damped Pendulum")
+plt.xlabel("Angle θ (rad)")
+plt.ylabel("Angular velocity ω (rad/s)")
+plt.grid(True)
+plt.show()
+</code></pre>
+<hr/>
+<p><img alt="graphic" src="../images/image_P1_1.png"/>
+<img alt="graphic" src="../images/image_P2_2.png"/></p>
+<h2 id="5-extending-the-analysis-poincare-section">5. Extending the Analysis: Poincaré Section</h2>
+<p>To analyze transitions to chaos, sample the system at driving period intervals <span class="arithmatex">\(T = \frac{2\pi}{\omega}\)</span>:</p>
+<pre><code class="language-python">T = 2 * np.pi / omega
+poincare_times = np.arange(0, t_span[1], T)
+
+# Interpolate solution at Poincare times
+theta_poincare = np.interp(poincare_times, sol.t, sol.y[0])
+omega_poincare = np.interp(poincare_times, sol.t, sol.y[1])
+
+plt.figure(figsize=(6,6))
+plt.scatter(theta_poincare, omega_poincare, s=10, color='red')
+plt.title("Poincaré Section of Forced Damped Pendulum")
+plt.xlabel("Angle θ (rad)")
+plt.ylabel("Angular velocity ω (rad/s)")
+plt.grid(True)
+plt.show()
+</code></pre>
+<hr/>
+<p><img alt="graphic" src="../images/image_P2_3.png"/></p>
+<h2 id="6-discussion-on-limitations-and-extensions">6. Discussion on Limitations and Extensions</h2>
+<ul>
+<li><strong>Nonlinearity:</strong> Full nonlinear <span class="arithmatex">\(\sin \theta\)</span> model necessary for large oscillations.</li>
+<li><strong>Numerical Sensitivity:</strong> Chaotic regimes require fine resolution and careful numerical methods.</li>
+<li><strong>Extensions:</strong> Introduce nonlinear damping, non-periodic forcing, or coupling multiple pendulums.</li>
+<li><strong>Physical factors:</strong> Air resistance, structural flex, and other real-world factors not included here.</li>
+</ul>
+<hr/>
+<h1 id="summary">Summary</h1>
+<ul>
+<li>Derived and analyzed forced damped pendulum equations.</li>
+<li>Explored approximate linear solutions and resonance.</li>
+<li>Created computational models to simulate and visualize behavior.</li>
+<li>Used phase space and Poincaré sections to identify chaotic transitions.</li>
+<li>Discussed real-world relevance and possible extensions.</li>
+</ul>
 </div>
 </div><footer>
 <div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
