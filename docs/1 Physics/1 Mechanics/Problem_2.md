@@ -161,7 +161,7 @@ plt.show()
 ```
 
 ---
-![graphic](../images/image_P1_1.png)
+![graphic](../images/image_P2_1.png)
 ![graphic](../images/image_P2_2.png)
 
 
