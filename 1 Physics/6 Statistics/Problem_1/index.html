@@ -172,6 +172,95 @@
 <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
 <div class="section" itemprop="articleBody">
 <h1 id="problem-1">Problem 1</h1>
+<h1 id="exploring-the-central-limit-theorem-through-simulations">Exploring the Central Limit Theorem through Simulations</h1>
+<h2 id="motivation">Motivation</h2>
+<p>The <strong>Central Limit Theorem (CLT)</strong> is one of the most important results in probability theory and statistics. It states that the sampling distribution of the sample mean will tend to approximate a <strong>normal distribution</strong> as the sample size increases, regardless of the shape of the population's original distribution (as long as the variance is finite).</p>
+<p>This theorem is foundational because it justifies the widespread use of the normal distribution in inferential statistics. It underlies the logic of confidence intervals, hypothesis testing, and many machine learning models. Simulations offer a compelling, visual, and intuitive way to understand how and why the CLT holds. By conducting repeated sampling from different population types, we can observe the formation of the bell-shaped curve in action.</p>
+<hr/>
+<h2 id="task-breakdown">Task Breakdown</h2>
+<h3 id="1-simulating-sampling-distributions">1. Simulating Sampling Distributions</h3>
+<p>We begin with generating three types of population distributions:</p>
+<ul>
+<li><strong>Uniform Distribution</strong>: All values within a given interval are equally likely. For example, values between 0 and 1.</li>
+<li><strong>Exponential Distribution</strong>: Characterized by a strong right-skew, it models time between events in a Poisson process.</li>
+<li><strong>Binomial Distribution</strong>: Represents discrete outcomes from a fixed number of Bernoulli trials with a given probability of success.</li>
+</ul>
+<p>For each distribution type:</p>
+<ul>
+<li>Create a <strong>population dataset</strong> with a large number of elements (e.g., 100,000 samples) using random number generators.</li>
+<li>This population dataset will be used to draw multiple random samples of various sizes.</li>
+</ul>
+<hr/>
+<h3 id="2-sampling-and-visualization">2. Sampling and Visualization</h3>
+<p>We simulate the sampling process as follows:</p>
+<ul>
+<li>Choose a set of sample sizes: <span class="arithmatex">\(n = 5, 10, 30, 50, 100\)</span>.</li>
+<li>For each sample size, draw a large number (e.g., 1000) of random samples from the population.</li>
+<li>Compute the <strong>sample mean</strong> of each sample.</li>
+<li>Store all sample means and plot them using histograms.</li>
+</ul>
+<p>Through these histograms, we can visually analyze:</p>
+<ul>
+<li>How the <strong>shape of the sampling distribution</strong> evolves.</li>
+<li>The <strong>rate at which normality is approached</strong> as sample size increases.</li>
+<li>How original population characteristics influence the convergence.</li>
+</ul>
+<p>We also recommend using KDE plots (kernel density estimators) to better visualize the smooth approximation of the sampling distribution.</p>
+<hr/>
+<h3 id="3-parameter-exploration">3. Parameter Exploration</h3>
+<p>To deepen our understanding of the CLT, we vary key parameters:</p>
+<h4 id="a-sample-size">A. Sample Size</h4>
+<p>Larger sample sizes generally yield a sampling distribution of the mean that is more closely approximated by a normal distribution. This can be clearly observed even when the underlying population is skewed (e.g., exponential).</p>
+<h4 id="b-population-distribution-shape">B. Population Distribution Shape</h4>
+<p>Different shapes converge at different rates:</p>
+<ul>
+<li>Normal: already satisfies conditions of CLT, fast convergence.</li>
+<li>Uniform: moderate convergence speed.</li>
+<li>Exponential: slow convergence due to heavy skew.</li>
+</ul>
+<h4 id="c-population-variance">C. Population Variance</h4>
+<p>Variance plays a crucial role:</p>
+<ul>
+<li>Higher variance in the population results in <strong>wider sampling distributions</strong>.</li>
+<li>Variance of the sampling distribution decreases with increasing sample size, as per:</li>
+</ul>
+<p><span class="arithmatex">\(\text{Var}(\bar{X}) = \frac{\sigma^2}{n}\)</span></p>
+<p>This means that as sample size increases, the sample mean becomes a more precise estimator of the population mean.</p>
+<hr/>
+<h3 id="4-practical-applications-of-the-clt">4. Practical Applications of the CLT</h3>
+<p>The Central Limit Theorem has a wide range of practical uses, including:</p>
+<ul>
+<li><strong>Estimating population parameters</strong>: With the CLT, we can make probabilistic statements about population parameters using only sample data.</li>
+<li><strong>Quality control</strong>: Used to monitor and control manufacturing processes. For example, checking if the average weight of produced items deviates from a standard.</li>
+<li><strong>Polling and Surveys</strong>: Helps to justify inference from small, random samples to the broader population.</li>
+<li><strong>Finance</strong>: Used in risk modeling and portfolio theory to approximate the distribution of returns.</li>
+<li><strong>Health and Medicine</strong>: Clinical trials often rely on the CLT for interpreting mean treatment effects.</li>
+<li><strong>Machine Learning</strong>: Many statistical learning algorithms assume or rely on properties of the normal distribution.</li>
+</ul>
+<hr/>
+<h2 id="deliverables">Deliverables</h2>
+<ul>
+<li>
+<p>A well-documented <strong>Markdown report</strong> and accompanying <strong>Python script or Jupyter notebook</strong> that includes:</p>
+</li>
+<li>
+<p>Simulated population generation for each distribution.</p>
+</li>
+<li>Sample mean extraction and visualization through histograms and KDEs.</li>
+<li>Detailed observations on the emergence of normality in sampling distributions.</li>
+<li>Theoretical interpretation and relevance to the Central Limit Theorem.</li>
+</ul>
+<hr/>
+<h2 id="hints-and-resources">Hints and Resources</h2>
+<ul>
+<li>Use <code>NumPy</code> for creating population and sample arrays: <code>np.random.uniform</code>, <code>np.random.exponential</code>, <code>np.random.binomial</code>.</li>
+<li>Use <code>Matplotlib</code> and <code>Seaborn</code> for plotting. Overlay normal curves for comparison using <code>scipy.stats.norm.pdf</code>.</li>
+<li>Start small: first run simulations with the uniform distribution before attempting more complex or skewed distributions.</li>
+<li>Encourage experimentation by modifying the number of samples, sample sizes, and population parameters.</li>
+</ul>
+<hr/>
+<h2 id="conclusion">Conclusion</h2>
+<p>This simulation-based exploration of the Central Limit Theorem provides concrete, visual evidence of a critical concept in statistics. Whether dealing with continuous or discrete data, symmetric or skewed distributions, the average of repeated samples behaves predictably. The CLT not only empowers us to make inference from samples but also forms the mathematical justification for many statistical tools and methodologies.</p>
 </div>
 </div><footer>
 <div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
