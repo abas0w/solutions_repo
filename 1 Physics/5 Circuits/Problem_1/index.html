@@ -78,36 +78,6 @@
 <ul class="current">
 <li class="toctree-l2 current"><a class="reference internal current" href="#">Problem 1</a>
 <ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="#1-algorithm-for-calculating-equivalent-resistance-using-graph-theory">1. Algorithm for Calculating Equivalent Resistance Using Graph Theory</a>
-<ul>
-<li class="toctree-l4"><a class="reference internal" href="#problem-overview">Problem Overview:</a>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="#key-steps-in-the-algorithm">Key Steps in the Algorithm:</a>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="#pseudocode-for-the-algorithm">Pseudocode for the Algorithm:</a>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#2-full-implementation-in-python">2. Full Implementation in Python</a>
-<ul>
-<li class="toctree-l4"><a class="reference internal" href="#step-by-step-python-implementation">Step-by-Step Python Implementation:</a>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="#explanation-of-the-code">Explanation of the Code:</a>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="#output-example">Output Example:</a>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#3-efficiency-and-potential-improvements">3. Efficiency and Potential Improvements</a>
-<ul>
-<li class="toctree-l4"><a class="reference internal" href="#algorithm-efficiency">Algorithm Efficiency:</a>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="#potential-improvements">Potential Improvements:</a>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#4-conclusion">4. Conclusion</a>
-</li>
 </ul>
 </li>
 </ul>
@@ -202,183 +172,275 @@
 <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
 <div class="section" itemprop="articleBody">
 <h1 id="problem-1">Problem 1</h1>
-<h2 id="1-algorithm-for-calculating-equivalent-resistance-using-graph-theory">1. <strong>Algorithm for Calculating Equivalent Resistance Using Graph Theory</strong></h2>
-<h3 id="problem-overview">Problem Overview:</h3>
-<p>In graph theory, a circuit is represented as a <strong>graph</strong> where:</p>
+<hr/>
+<h1 id="equivalent-resistance-using-graph-theory">Equivalent Resistance Using Graph Theory</h1>
+<hr/>
+<h2 id="1-introduction-and-background">1. Introduction and Background</h2>
+<p>Electrical circuits can often be simplified by combining resistors in series and parallel. When circuits become complex with multiple loops and junctions, manual simplification becomes tedious and error-prone. Representing the circuit as a graph helps us automate this process.</p>
 <ul>
-<li><strong>Nodes</strong> represent junctions of the circuit (where resistors meet),</li>
-<li><strong>Edges</strong> represent the resistors themselves, and the weight of each edge corresponds to the resistance of that resistor.</li>
+<li><strong>Nodes (Vertices):</strong> Represent connection points (junctions) in the circuit.</li>
+<li><strong>Edges:</strong> Represent resistors between nodes, weighted by their resistance value.</li>
 </ul>
-<p>The goal is to simplify a complex circuit graph into an equivalent resistance by iteratively reducing series and parallel resistor combinations. In simpler terms:</p>
+<hr/>
+<h2 id="2-how-to-identify-series-and-parallel-in-a-graph">2. How to Identify Series and Parallel in a Graph?</h2>
+<h3 id="parallel-edges">Parallel Edges</h3>
 <ul>
-<li>
-<p><strong>Series connection</strong>: Resistors connected in series have the total resistance equal to the sum of individual resistances:
-  <span class="arithmatex">\(R_{\text{eq}} = R_1 + R_2 + \dots + R_n\)</span></p>
-</li>
-<li>
-<p><strong>Parallel connection</strong>: Resistors connected in parallel have the total resistance given by the reciprocal of the sum of reciprocals:
-  <span class="arithmatex">\(\frac{1}{R_{\text{eq}}} = \frac{1}{R_1} + \frac{1}{R_2} + \dots + \frac{1}{R_n}\)</span></p>
-</li>
+<li>When <strong>multiple edges</strong> connect the same pair of nodes, they represent resistors in <strong>parallel</strong>.</li>
+<li>Their equivalent resistance <span class="arithmatex">\(R_{eq}\)</span> is calculated as:</li>
 </ul>
-<h3 id="key-steps-in-the-algorithm">Key Steps in the Algorithm:</h3>
+<div class="arithmatex">\[
+\frac{1}{R_{eq}} = \sum_{i=1}^{n} \frac{1}{R_i}
+\]</div>
+<hr/>
+<h3 id="series-edges">Series Edges</h3>
+<ul>
+<li>If a node (except start/end terminals) connects exactly <strong>two edges</strong>, these two resistors are in <strong>series</strong>.</li>
+<li>Node degree = 2 means exactly two neighbors.</li>
+<li>Equivalent resistance of series resistors is the sum:</li>
+</ul>
+<div class="arithmatex">\[
+R_{eq} = R_1 + R_2
+\]</div>
+<ul>
+<li>After combining, the node is removed, and the two edges are replaced by a single edge.</li>
+</ul>
+<hr/>
+<h3 id="nested-and-complex-configurations">Nested and Complex Configurations</h3>
+<ul>
+<li>Circuits often have series inside parallel or vice versa.</li>
+<li>The algorithm <strong>repeatedly</strong> detects and reduces series and parallel edges until the entire graph is reduced to one edge between the two terminals.</li>
+</ul>
+<hr/>
+<h2 id="3-detailed-algorithm-steps">3. Detailed Algorithm Steps</h2>
 <ol>
 <li>
-<p><strong>Represent the circuit as a graph</strong>: The circuit is represented as a graph where:</p>
+<p><strong>Input:</strong></p>
 </li>
 <li>
-<p>Each resistor is an edge with a weight equal to its resistance.</p>
+<p>A weighted undirected graph <span class="arithmatex">\(G\)</span> representing the circuit.</p>
 </li>
 <li>
-<p>Each junction is a node.</p>
+<p>Two special nodes, <code>start</code> and <code>end</code>.</p>
 </li>
 <li>
-<p><strong>Identify and reduce series connections</strong>: A series connection is a direct path between two nodes, with resistors connected in line. This can be detected as nodes with only two neighbors, connected through resistors. The total resistance is the sum of the resistances.</p>
-</li>
-<li>
-<p><strong>Identify and reduce parallel connections</strong>: A parallel connection occurs when two or more resistors are connected between the same two nodes. This can be detected by identifying multiple edges between two nodes. The equivalent resistance is the reciprocal of the sum of the reciprocals of the individual resistances.</p>
-</li>
-<li>
-<p><strong>Iterate</strong>: Repeat the process of simplifying the graph, handling both series and parallel combinations, until only one node (the equivalent resistance) remains.</p>
-</li>
-<li>
-<p><strong>Handle Nested Combinations</strong>: As you reduce the graph, the combinations of series and parallel resistors may become nested, and the algorithm needs to handle these by simplifying them step by step, ensuring that cycles and more complex connections are addressed appropriately.</p>
+<p><strong>Loop until only one edge between start and end remains:</strong></p>
 </li>
 </ol>
+<p>a. <strong>Simplify Parallel Edges:</strong></p>
+<ul>
+<li>Find all edges connecting the same node pairs.</li>
+<li>Compute their parallel equivalent resistance.</li>
+<li>Replace them with a single edge.</li>
+</ul>
+<p>b. <strong>Simplify Series Edges:</strong></p>
+<ul>
+<li>Find nodes (excluding start/end) with degree 2.</li>
+<li>Combine the two edges connected to that node in series.</li>
+<li>Remove that node.</li>
+<li>
+<p>If an edge already exists between the two neighbors, combine with it in parallel.</p>
+</li>
+<li>
+<p><strong>Return the resistance of the remaining edge.</strong></p>
+</li>
+</ul>
 <hr/>
-<h3 id="pseudocode-for-the-algorithm">Pseudocode for the Algorithm:</h3>
-<pre><code class="language-text">function calculate_equivalent_resistance(graph):
-    while graph has more than one node:
-        // Step 1: Look for series connections
-        for each series pair of resistors:
-            if resistors are in series (only two neighbors for both):
-                R_eq = sum of resistances of the series resistors
-                replace the series resistors with a single resistor R_eq
-
-        // Step 2: Look for parallel connections
-        for each parallel pair of resistors:
-            if resistors are in parallel (same two nodes):
-                R_eq = 1 / (sum of the reciprocals of the resistances)
-                replace the parallel resistors with a single resistor R_eq
-
-        // Step 3: Update the graph
-        simplify the graph by removing used resistors and updating connections
-
-    return the remaining resistance value
+<h2 id="4-why-this-approach">4. Why this Approach?</h2>
+<ul>
+<li><strong>Systematic and automatable:</strong> Perfect for coding.</li>
+<li><strong>Handles arbitrary graphs:</strong> Works for any circuit configuration.</li>
+<li><strong>Visualizable:</strong> You can plot each step, showing the simplifications.</li>
+</ul>
+<hr/>
+<h2 id="5-python-code-implementation">5. Python Code Implementation</h2>
+<p>The code below:</p>
+<ul>
+<li>Uses <code>networkx</code> to represent the circuit graph.</li>
+<li>Detects and simplifies series and parallel edges iteratively.</li>
+<li>Uses <code>matplotlib</code> to plot the graph after each simplification step.</li>
+<li>Runs in Google Colab with inline plots.</li>
+</ul>
+<hr/>
+<h3 id="installation-for-google-colab">Installation (for Google Colab)</h3>
+<pre><code class="language-python">!pip install networkx matplotlib
 </code></pre>
 <hr/>
-<h2 id="2-full-implementation-in-python">2. <strong>Full Implementation in Python</strong></h2>
-<p>For the <strong>advanced task</strong>, I'll implement the algorithm using <strong>Python</strong> and the <strong>NetworkX</strong> library. This library will be useful for handling the graph structure and manipulation.</p>
-<p>We'll create a graph where each edge has a resistance value, and we'll iteratively simplify the graph by finding series and parallel connections. We'll also consider handling cycles and nested resistor combinations.</p>
-<h3 id="step-by-step-python-implementation">Step-by-Step Python Implementation:</h3>
+<h3 id="code">Code</h3>
 <pre><code class="language-python">import networkx as nx
-import numpy as np
+import matplotlib.pyplot as plt
 
-# Function to calculate equivalent resistance in series
-def series_resistance(resistances):
-    return sum(resistances)
+def plot_circuit(G, title="Circuit Graph", node_pos=None):
+    plt.figure(figsize=(8,6))
+    if not node_pos:
+        node_pos = nx.spring_layout(G, seed=42)
+    edge_labels = {(u, v): f"{d['resistance']:.2f}Ω" for u, v, d in G.edges(data=True)}
+    nx.draw(G, pos=node_pos, with_labels=True, node_size=700, node_color='lightblue')
+    nx.draw_networkx_edge_labels(G, pos=node_pos, edge_labels=edge_labels, font_color='red')
+    plt.title(title)
+    plt.show()
+    return node_pos
 
-# Function to calculate equivalent resistance in parallel
-def parallel_resistance(resistances):
-    return 1 / sum(1 / np.array(resistances))
+def simplify_parallel(G):
+    """
+    Simplify all parallel edges by merging multiple edges between same nodes.
+    """
+    removed_any = False
+    # NetworkX MultiGraph allows multiple edges; convert to simple Graph for parallel detection
+    # We'll create a new graph with combined edges
 
-# Function to detect and reduce series combinations
-def reduce_series(graph):
-    for node1, node2, data in list(graph.edges(data=True)):
-        if graph.degree(node1) == 2 and graph.degree(node2) == 2:
-            # Check if the nodes have only one other connection, hence in series
-            r1 = data['resistance']
-            # Get the neighbor nodes
-            neighbor1 = list(graph.neighbors(node1))[0] if list(graph.neighbors(node1))[0] != node2 else list(graph.neighbors(node1))[1]
-            neighbor2 = list(graph.neighbors(node2))[0] if list(graph.neighbors(node2))[0] != node1 else list(graph.neighbors(node2))[1]
-            r2 = graph[node1][neighbor1]['resistance']
-            r3 = graph[node2][neighbor2]['resistance']
+    # Collect edges by node pairs
+    edge_dict = {}
+    for u, v, data in G.edges(data=True):
+        key = tuple(sorted([u,v]))
+        edge_dict.setdefault(key, []).append(data['resistance'])
 
-            # Combine the resistances
-            r_eq = series_resistance([r1, r2, r3])
+    # Rebuild graph with parallel edges merged
+    newG = nx.Graph()
+    newG.add_nodes_from(G.nodes())
+    for (u,v), resistances in edge_dict.items():
+        if len(resistances) &gt; 1:
+            # Calculate equivalent parallel resistance
+            inv_sum = sum(1/r for r in resistances)
+            Req = 1/inv_sum if inv_sum != 0 else float('inf')
+            removed_any = True
+            newG.add_edge(u,v, resistance=Req)
+        else:
+            newG.add_edge(u,v, resistance=resistances[0])
+    return newG, removed_any
 
-            # Replace the series resistors with the equivalent resistance
-            graph.add_edge(neighbor1, neighbor2, resistance=r_eq)
-            graph.remove_edge(node1, neighbor1)
-            graph.remove_edge(node2, neighbor2)
+def simplify_series(G, start, end):
+    """
+    Simplify nodes of degree 2 that are not start or end nodes (series resistors).
+    """
+    removed_any = False
+    nodes_to_remove = []
+
+    for node in list(G.nodes):
+        if node == start or node == end:
+            continue
+        if G.degree[node] == 2:
+            neighbors = list(G.neighbors(node))
+            u, w = neighbors[0], neighbors[1]
+            R1 = G.edges[u, node]['resistance']
+            R2 = G.edges[node, w]['resistance']
+            Req = R1 + R2
+
+            # Remove node and its edges
+            G.remove_node(node)
+
+            # If edge u-w exists, combine in parallel
+            if G.has_edge(u, w):
+                R_existing = G.edges[u, w]['resistance']
+                inv_sum = 1/Req + 1/R_existing
+                Req_parallel = 1/inv_sum
+                G.edges[u, w]['resistance'] = Req_parallel
+            else:
+                G.add_edge(u, w, resistance=Req)
+
+            removed_any = True
+            # Node removed, so continue iteration
             break
-    return graph
 
-# Function to detect and reduce parallel combinations
-def reduce_parallel(graph):
-    for node1, node2, data in list(graph.edges(data=True)):
-        if graph.degree(node1) &gt; 1 and graph.degree(node2) &gt; 1:
-            # Check if two nodes are connected in parallel
-            r1 = data['resistance']
-            # Get all other parallel connections
-            neighbors = list(graph.neighbors(node1))
-            other_resistances = [graph[node1][n]['resistance'] for n in neighbors if n != node2]
+    return G, removed_any
 
-            # Combine the resistances in parallel
-            r_eq = parallel_resistance([r1] + other_resistances)
+def equivalent_resistance(G, start, end):
+    """
+    Iteratively simplify the graph until only one edge remains between start and end.
+    """
+    iteration = 0
+    pos = None  # for consistent plotting positions
+    while True:
+        iteration += 1
+        print(f"Iteration {iteration}:")
+        plot_title = f"Iteration {iteration} - Before Simplification"
+        pos = plot_circuit(G, plot_title, node_pos=pos)
 
-            # Replace parallel resistors with the equivalent resistance
-            graph.add_edge(node1, node2, resistance=r_eq)
-            for n in neighbors:
-                if n != node2:
-                    graph.remove_edge(node1, n)
+        # Simplify parallel edges
+        G, changed_parallel = simplify_parallel(G)
+        if changed_parallel:
+            plot_circuit(G, f"Iteration {iteration} - After Parallel Simplification", node_pos=pos)
+
+        # Simplify series edges
+        G, changed_series = simplify_series(G, start, end)
+        if changed_series:
+            plot_circuit(G, f"Iteration {iteration} - After Series Simplification", node_pos=pos)
+
+        # Check if reduced to single edge between start and end
+        if G.number_of_edges() == 1 and G.has_edge(start, end):
+            print("Circuit reduced to single equivalent resistor.")
             break
-    return graph
 
-# Function to calculate equivalent resistance
-def calculate_equivalent_resistance(graph):
-    while len(graph.nodes) &gt; 1:
-        graph = reduce_series(graph)
-        graph = reduce_parallel(graph)
-    # Return the final resistance value
-    return list(graph.edges(data=True))[0][2]['resistance']
+        # If no changes, stop to prevent infinite loop
+        if not changed_parallel and not changed_series:
+            print("No further simplifications possible.")
+            break
 
-# Example circuit as a graph with resistances (in ohms)
-G = nx.Graph()
+    Req_final = G.edges[start, end]['resistance'] if G.has_edge(start, end) else None
+    print(f"Equivalent Resistance between {start} and {end}: {Req_final:.4f} Ω")
+    return Req_final
 
-# Add resistors as edges with resistance values
-G.add_edge(1, 2, resistance=10)
-G.add_edge(2, 3, resistance=20)
-G.add_edge(3, 4, resistance=30)
-G.add_edge(4, 5, resistance=40)
-G.add_edge(2, 5, resistance=50)
+# Example circuit setup
+def example_circuit():
+    G = nx.Graph()
+    # Add nodes
+    G.add_nodes_from(['A', 'B', 'C', 'D'])
+    # Add edges with resistances (Ohms)
+    # Example: A-B (5Ω), B-C (10Ω), A-C (20Ω), C-D (15Ω)
+    G.add_edge('A', 'B', resistance=5)
+    G.add_edge('B', 'C', resistance=10)
+    G.add_edge('A', 'C', resistance=20)
+    G.add_edge('C', 'D', resistance=15)
 
-# Calculate the equivalent resistance for the graph
-R_eq = calculate_equivalent_resistance(G)
-print(f"Equivalent Resistance: {R_eq} Ohms")
+    return G
+
+# Run in Google Colab
+if __name__ == "__main__":
+    circuit_graph = example_circuit()
+    start_node = 'A'
+    end_node = 'D'
+    equivalent_resistance(circuit_graph, start_node, end_node)
 </code></pre>
-<h3 id="explanation-of-the-code">Explanation of the Code:</h3>
-<ol>
-<li><strong>Graph Representation</strong>: We use a <strong>NetworkX graph</strong> where nodes represent junctions and edges represent resistors.</li>
-<li>
-<p><strong>Series and Parallel Reduction</strong>:</p>
-</li>
-<li>
-<p><strong>Series Reduction</strong>: The <code>reduce_series</code> function combines series-connected resistors.</p>
-</li>
-<li><strong>Parallel Reduction</strong>: The <code>reduce_parallel</code> function identifies resistors connected in parallel and combines them.</li>
-<li><strong>Iterative Simplification</strong>: The <code>calculate_equivalent_resistance</code> function keeps applying series and parallel reduction until only one node (the equivalent resistance) remains.</li>
-<li><strong>Test Example</strong>: The example graph represents a simple circuit with five nodes and resistors in both series and parallel configurations.</li>
-</ol>
-<h3 id="output-example">Output Example:</h3>
-<pre><code class="language-plaintext">Equivalent Resistance: 14.0 Ohms
-</code></pre>
-<p>This is the final equivalent resistance of the given network after simplification.</p>
+<p><img alt="graphic" src="../images/image_C1_1.png"/></p>
+<p><img alt="graphic" src="../images/image_C1_2.png"/></p>
+<p><img alt="graphic" src="../images/image_C1_3.png"/></p>
+<p><img alt="graphic" src="../images/image_C1_4.png"/></p>
 <hr/>
-<h2 id="3-efficiency-and-potential-improvements">3. <strong>Efficiency and Potential Improvements</strong></h2>
-<h3 id="algorithm-efficiency">Algorithm Efficiency:</h3>
+<h2 id="6-how-to-use-this-in-google-colab">6. How to Use This in Google Colab?</h2>
+<ol>
+<li><strong>Copy and paste the code</strong> into a notebook cell.</li>
+<li>Run the cell to install dependencies if necessary.</li>
+<li>Run the code — it will plot the circuit graph and its simplifications step-by-step.</li>
+<li>It prints the final equivalent resistance.</li>
+</ol>
+<hr/>
+<h2 id="7-explanation-of-the-example-circuit">7. Explanation of the Example Circuit</h2>
 <ul>
-<li><strong>Time Complexity</strong>: The time complexity of the algorithm is primarily influenced by the number of nodes and edges in the graph. Each reduction (series/parallel) requires a scan through the edges, making the algorithm complexity approximately <span class="arithmatex">\(O(E)\)</span>, where <span class="arithmatex">\(E\)</span> is the number of edges.</li>
-<li><strong>Space Complexity</strong>: The space complexity is <span class="arithmatex">\(O(V + E)\)</span> due to the graph structure, where <span class="arithmatex">\(V\)</span> is the number of vertices (junctions) and <span class="arithmatex">\(E\)</span> is the number of edges (resistors).</li>
+<li>Nodes: A, B, C, D.</li>
+<li>
+<p>Edges/resistors:</p>
+</li>
+<li>
+<p>A-B = 5 Ω</p>
+</li>
+<li>B-C = 10 Ω</li>
+<li>A-C = 20 Ω (parallel to series of A-B-C)</li>
+<li>C-D = 15 Ω (series with the combined network between A and C)</li>
 </ul>
-<h3 id="potential-improvements">Potential Improvements:</h3>
-<ol>
-<li><strong>Advanced Parallelization</strong>: For large circuits, the algorithm can be parallelized to handle multiple series and parallel reductions simultaneously.</li>
-<li><strong>Cycle Detection</strong>: For more complex circuits, detecting and handling cycles will be necessary to prevent infinite loops in simplifications.</li>
-<li><strong>Edge Cases</strong>: Handling disconnected components or infinite loops in certain complex resistor networks may require additional checks or optimizations.</li>
-</ol>
+<p>Stepwise simplification will:</p>
+<ul>
+<li>First combine A-B and B-C (series 5 + 10 = 15 Ω),</li>
+<li>Then combine parallel edges between A-C (20 Ω) and combined (15 Ω),</li>
+<li>Finally add series C-D (15 Ω).</li>
+</ul>
+<p>The code plots each step and prints final equivalent resistance between A and D.</p>
 <hr/>
-<h2 id="4-conclusion">4. <strong>Conclusion</strong></h2>
-<p>This solution successfully calculates the equivalent resistance of an electrical circuit using graph theory and iterative simplification. By leveraging NetworkX, we can efficiently model the circuit as a graph, detect series and parallel combinations, and reduce the network step-by-step until the final equivalent resistance is computed.</p>
+<h2 id="8-additional-notes">8. Additional Notes</h2>
+<ul>
+<li>The current implementation assumes simple graphs (no multiple edges at the same time). It detects parallel edges by grouping edges between same nodes.</li>
+<li>You can customize the circuit by adding/removing nodes or edges with different resistances.</li>
+<li>For very complex circuits, the algorithm still works as long as it can detect series and parallel resistors.</li>
+</ul>
+<hr/>
 </div>
 </div><footer>
 <div aria-label="Footer Navigation" class="rst-footer-buttons" role="navigation">
